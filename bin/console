@@ -2,40 +2,27 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
-class SomeThreadedClass extends Thread
-{
-    /**
-     * @var int
-     */
-    private $tID;
+use Threaded\Autoloader;
+use Threaded\Divan;
+use Threaded\Task;
+//sleep(60 * 60 * 24);
+$divan = new Divan('172.17.0.1', 15984, 'root', 'X5u/07rm');
+print_r($divan->getAllDatabases());
 
-    /**
-     * @var string
-     */
-    public $data;
+$pool = new Pool(5, Autoloader::class, [__DIR__ . '/../vendor/autoload.php']);
+/* submit a task to the pool */
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+$pool->submit(new Task(random_int(1, 100)));
+/* in the real world, do some ::collect somewhere */
+/* shutdown, because explicit is good */
+$pool->shutdown();
 
-    public function __construct(int $tID)
-    {
-        $this->tID  = $tID;
-        $this->data = $tID . ":" . date('H:i:s');
-    }
-
-    public function run()
-    {
-        echo $this->tID, " started", PHP_EOL;
-        sleep($this->tID);
-        echo $this->tID, " ended ", date('H:i:s'), PHP_EOL;
-    }
-}
-
-$threads = [];
-
-for ($i = 1; $i < 5; ++$i) {
-    $threads[$i] = new SomeThreadedClass($i);
-    $threads[$i]->start();            // start the job on the background
-}
-
-for ($i = 1; $i < 5; ++$i) {
-    $threads[$i]->join();             // wait until job is finished,
-    echo $threads[$i]->data, PHP_EOL; // then we can access the data
-}
+print_r($divan->getAllDatabases());
