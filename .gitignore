@@ -1,0 +1,18 @@
+# Managed by Composer
+/bin/*
+!bin/console
+!bin/symfony_requirements
+/vendor/
+
+# PHPUnit
+/phpunit.xml
+
+# Build data
+/build/
+
+# Composer PHAR
+/composer.phar
+
+# User Environment Variables
+.idea/
+.DS_Store

@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+class SomeThreadedClass extends Thread
+{
+    /**
+     * @var int
+     */
+    private $tID;
+
+    /**
+     * @var string
+     */
+    public $data;
+
+    public function __construct(int $tID)
+    {
+        $this->tID  = $tID;
+        $this->data = $tID . ":" . date('H:i:s');
+    }
+
+    public function run()
+    {
+        echo $this->tID, " started", PHP_EOL;
+        sleep($this->tID);
+        echo $this->tID, " ended ", date('H:i:s'), PHP_EOL;
+    }
+}
+
+$threads = [];
+
+for ($i = 1; $i < 5; ++$i) {
+    $threads[$i] = new SomeThreadedClass($i);
+    $threads[$i]->start();            // start the job on the background
+}
+
+for ($i = 1; $i < 5; ++$i) {
+    $threads[$i]->join();             // wait until job is finished,
+    echo $threads[$i]->data, PHP_EOL; // then we can access the data
+}

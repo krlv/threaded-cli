@@ -1,0 +1,16 @@
+{
+  "name": "threaded-cli",
+  "description": "Multithreaded CLI application",
+  "authors": [
+    {
+      "name": "Eugene Kirillov",
+      "email": "eug.krlv@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0"
+  },
+  "config": {
+    "bin-dir": "bin/"
+  }
+}
