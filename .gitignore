@@ -1,6 +1,8 @@
 # Managed by Composer
 /bin/*
 !bin/console
+!bin/setup
+!bin/sleep
 !bin/symfony_requirements
 /vendor/
 

@@ -2,9 +2,9 @@ version: '2'
 
 services:
     db:
-        image: klaemo/couchdb:2.0-dev
+        build: docker/couchdb
         ports:
-            - "15984:15984"
+            - "5984:5984"
 
     php:
         build: docker/php-fpm

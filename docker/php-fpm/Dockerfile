@@ -11,4 +11,4 @@ RUN docker-php-source extract \
     && docker-php-source delete \
     && apk del .build-deps
 
-CMD ["php", "./bin/console"]
+CMD ["php", "./bin/sleep"]

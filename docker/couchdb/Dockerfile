@@ -1,0 +1,4 @@
+FROM klaemo/couchdb:2.0.0
+
+ENV COUCHDB_USER=root
+ENV COUCHDB_PASSWORD=X5ud07rm

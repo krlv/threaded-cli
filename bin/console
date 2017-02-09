@@ -5,8 +5,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Threaded\Autoloader;
 use Threaded\Divan;
 use Threaded\Task;
-//sleep(60 * 60 * 24);
-$divan = new Divan('172.17.0.1', 15984, 'root', 'X5u/07rm');
+
+$divan = new Divan('172.17.0.1', 5984, 'root', 'X5ud07rm');
 print_r($divan->getAllDatabases());
 
 $pool = new Pool(5, Autoloader::class, [__DIR__ . '/../vendor/autoload.php']);
