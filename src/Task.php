@@ -1,6 +1,9 @@
 <?php
 namespace Threaded;
 
+use Threaded\Couch\Client;
+use Threaded\Couch\Exception\ExceptionInterface;
+
 class Task extends \Threaded
 {
     private $user;
@@ -19,9 +22,9 @@ class Task extends \Threaded
     public function run()
     {
         try {
-            $divan = new Divan('172.17.0.1', 5984, 'root', 'X5ud07rm');
+            $divan = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
             $divan->createDatabase('timeline_user_' . $this->user);
-        } catch (\Throwable $exception) {
+        } catch (ExceptionInterface $exception) {
             echo $exception->getMessage(), PHP_EOL;
         }
     }
