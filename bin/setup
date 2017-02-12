@@ -11,6 +11,8 @@ try {
     $couch->getDatabase('channels');
 } catch (NotFoundException $exception) {
     $couch->createDatabase('channels', ['query' => ['n' => 3, 'q' => 8]]);
+    echo 'Database \'channels\' was created', PHP_EOL;
+
     $couch->createDesignDocument('channels', 'channel', [
         'views' => [
             'active' => [
@@ -23,26 +25,52 @@ try {
         ],
         'language' => 'javascript',
     ]);
-
-    for ($i = 0; $i < 1000; ++$i) {
-        $team = random_int(1, 1000);
-        $user = random_int(1, 1000);
-
-        $channels = [];
-        for ($j = 0, $n = random_int(1, 4); $j < $n; ++$j) {
-            $channels[] = [
-                'channel_id' => 'channel_' . $n,
-                'team_id'    => $team,
-                'user_id'    => $user,
-                'title'      => 'Channel #' . $n,
-                'is_active'  => true,
-            ];
-        }
-
-        $couch->bulkDocuments('channels', $channels);
-    }
+    echo 'Design document \'channels\' was created for database \'channels\'', PHP_EOL;
 }
 
+try {
+    $couch->getDatabase('channel_notifications');
+} catch (NotFoundException $exception) {
+    $couch->createDatabase('channel_notifications', ['query' => ['n' => 3, 'q' => 8]]);
+    echo 'Database \'channel_notifications\' was created', PHP_EOL;
+}
+
+for ($i = 0; $i < 1000; ++$i) {
+    $team = random_int(1, 1000);
+    $user = random_int(1, 1000);
+
+    $channels = [];
+    for ($j = 1, $n = random_int(1, 4); $j < $n; ++$j) {
+        $channels[] = [
+            'channel_id' => sprintf('channel%d_team%d_user%d', $j, $team, $user),
+            'team_id'    => $team,
+            'user_id'    => $user,
+            'title'      => sprintf('Channel #%d (team: %d, user: %d)', $j, $team, $user),
+            'is_active'  => true,
+        ];
+    }
+    $couch->bulkDocuments('channels', $channels);
+
+    array_walk($channels, function (array $channel) use ($couch) {
+        $unread = random_int(1, 10);
+
+        $couch->createDocument('channel_notifications', [
+            '_id'    => $channel['channel_id'],
+            'unread' => $unread,
+        ]);
+
+        $db = sprintf('channel_notifications_t%d_u%d', $channel['team_id'], $channel['user_id']);
+
+        try {
+            $couch->getDatabase($db);
+        } catch (NotFoundException $exception) {
+            $couch->createDatabase($db, ['query' => ['n' => 3, 'q' => 8]]);
+            echo 'Database \'', $db, '\' was created', PHP_EOL;
+        }
+
+        $couch->createDocument($db, ['unread' => $unread]);
+    });
+}
 
 
 
