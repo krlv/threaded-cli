@@ -1,0 +1,50 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Threaded\Couch\Client;
+use Threaded\Couch\Exception\NotFoundException;
+
+$couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
+
+try {
+    $couch->getDatabase('channels');
+} catch (NotFoundException $exception) {
+    $couch->createDatabase('channels', ['query' => ['n' => 3, 'q' => 8]]);
+    $couch->createDesignDocument('channels', 'channel', [
+        'views' => [
+            'active' => [
+                'map' => 'function (doc) {
+                    if (doc.is_active == 1) {
+                        emit([doc.team_id, doc.user_id], doc);
+                    }
+                }',
+            ],
+        ],
+        'language' => 'javascript',
+    ]);
+
+    for ($i = 0; $i < 1000; ++$i) {
+        $team = random_int(1, 1000);
+        $user = random_int(1, 1000);
+
+        $channels = [];
+        for ($j = 0, $n = random_int(1, 4); $j < $n; ++$j) {
+            $channels[] = [
+                'channel_id' => 'channel_' . $n,
+                'team_id'    => $team,
+                'user_id'    => $user,
+                'title'      => 'Channel #' . $n,
+                'is_active'  => true,
+            ];
+        }
+
+        $couch->bulkDocuments('channels', $channels);
+    }
+}
+
+
+
+
+
+
