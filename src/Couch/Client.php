@@ -53,6 +53,12 @@ class Client
         return $this->request('POST', sprintf('/%s/_bulk_docs', $db), $params);
     }
 
+    public function createDesignDocument(string $db, string $name, array $ddoc, array $params = []): array
+    {
+        $params['json'] = $ddoc;
+        return $this->request('PUT', sprintf('/%s/_design/%s', $db, $name), $params);
+    }
+
     private function request(string $method, string $uri, array $options): array
     {
         try {
