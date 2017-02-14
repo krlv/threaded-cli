@@ -6,14 +6,14 @@ use Threaded\Couch\Exception\ExceptionInterface;
 
 class Task extends \Threaded
 {
-    private $user;
+    private $team;
 
     /**
-     * @param int $user User ID
+     * @param int $team Team ID
      */
-    public function __construct(int $user)
+    public function __construct(int $team)
     {
-        $this->user = $user;
+        $this->team = $team;
     }
 
     /**
@@ -22,8 +22,8 @@ class Task extends \Threaded
     public function run()
     {
         try {
-            $divan = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
-            $divan->createDatabase('timeline_user_' . $this->user);
+            $couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
+            echo 'Task will work with teams from shard ', $this->team, PHP_EOL;
         } catch (ExceptionInterface $exception) {
             echo $exception->getMessage(), PHP_EOL;
         }

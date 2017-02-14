@@ -7,20 +7,20 @@ use Threaded\Couch\Client;
 use Threaded\Task;
 
 $couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
-print_r($couch->getAllDatabases());
+//print_r($couch->getAllDatabases());
 
 $pool = new Pool(8, Autoloader::class, [__DIR__ . '/../vendor/autoload.php']);
-/* submit a task to the pool */
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-$pool->submit(new Task(random_int(1, 100)));
-/* in the real world, do some ::collect somewhere */
-/* shutdown, because explicit is good */
+// submit a task to the pool
+$pool->submit(new Task(0));
+$pool->submit(new Task(1));
+$pool->submit(new Task(2));
+$pool->submit(new Task(3));
+$pool->submit(new Task(4));
+$pool->submit(new Task(5));
+$pool->submit(new Task(6));
+$pool->submit(new Task(7));
+// in the real world, do some ::collect somewhere
+// shutdown, because explicit is good
 $pool->shutdown();
 
-print_r($couch->getAllDatabases());
+//print_r($couch->getAllDatabases());
