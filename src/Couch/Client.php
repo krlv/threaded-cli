@@ -59,6 +59,23 @@ class Client
         return $this->request('PUT', sprintf('/%s/_design/%s', $db, $name), $params);
     }
 
+    public function getAllDocuments(string $db, array $params = []): array
+    {
+        return $this->request('GET', sprintf('/%s/_all_docs', $db), $params);
+    }
+
+    public function getAllDocumentsByKeys(string $db, array $keys, array $params = []): array
+    {
+        $params['json'] = $keys;
+        return $this->request('POST', sprintf('/%s/_all_docs', $db), $params);
+    }
+
+    public function findDocuments(string $db, array $criteria, array $params = []): array
+    {
+        $params['json'] = $criteria;
+        return $this->request('POST', sprintf('/%s/_find', $db), $params);
+    }
+
     private function request(string $method, string $uri, array $options): array
     {
         try {
