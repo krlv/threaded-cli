@@ -30,6 +30,7 @@ class Task extends \Threaded
 
             do {
                 $docs = $this->getChannels($couch, $limit, $skip);
+                $docs = $this->updateChannels($couch, $docs);
 
                 $total += count($docs);
                 $skip  += $limit;
@@ -62,5 +63,14 @@ class Task extends \Threaded
             'skip'  => $skip,
         ];
         return $couch->findDocuments('channels', $query)['docs'];
+    }
+
+    private function updateChannels(Client $couch, array $docs): array
+    {
+        array_walk($docs, function (array &$dock) {
+            $dock['shard_id'] = $dock['team_id'] % 256;
+        });
+
+        return $couch->bulkDocuments('channels', $docs);
     }
 }
