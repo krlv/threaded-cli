@@ -76,6 +76,12 @@ class Client
         return $this->request('POST', sprintf('/%s/_find', $db), $params);
     }
 
+    public function getDatabaseChanges(string $db, array $params = []): array
+    {
+        $params = !empty($params) ? ['query' => $params] : [];
+        return $this->request('GET', sprintf('/%s/_changes', $db), $params);
+    }
+
     private function request(string $method, string $uri, array $options): array
     {
         try {
