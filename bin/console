@@ -6,21 +6,33 @@ use Threaded\Autoloader;
 use Threaded\Couch\Client;
 use Threaded\Task;
 
-$couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
+$time = microtime(true);
+
+//$couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
 //print_r($couch->getAllDatabases());
 
-$pool = new Pool(8, Autoloader::class, [__DIR__ . '/../vendor/autoload.php']);
+// number of shards in the application
+$shard = 256;
+
+// pool size
+$size = 8;
+$pool = new Pool($size, Autoloader::class, [__DIR__ . '/../vendor/autoload.php']);
+
+// each task will process $chunk amount of shards
+$chunk = round($shard / $size, 0, PHP_ROUND_HALF_UP);
+
 // submit a task to the pool
-$pool->submit(new Task(0));
-$pool->submit(new Task(1));
-$pool->submit(new Task(2));
-$pool->submit(new Task(3));
-$pool->submit(new Task(4));
-$pool->submit(new Task(5));
-$pool->submit(new Task(6));
-$pool->submit(new Task(7));
+for ($i = 0; $i < $size; ++$i) {
+    $start = $chunk * $i;
+    $end   = $chunk * ($i + 1) - 1;
+    $pool->submit(new Task($i, $start, $end));
+}
+
 // in the real world, do some ::collect somewhere
 // shutdown, because explicit is good
 $pool->shutdown();
+
+$time = microtime(true) - $time;
+echo 'Multi-thread worker finished in ', $time, ' seconds', PHP_EOL;
 
 //print_r($couch->getAllDatabases());

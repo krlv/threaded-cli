@@ -6,14 +6,31 @@ use Threaded\Couch\Exception\ExceptionInterface;
 
 class Task extends \Threaded
 {
-    private $team;
+    /**
+     * @var int serial number of task
+     */
+    private $taskId;
 
     /**
-     * @param int $team
+     * @var int
      */
-    public function __construct(int $team)
+    private $shardStart;
+
+    /**
+     * @var int
+     */
+    private $shardEnd;
+
+    /**
+     * @param int $taskId
+     * @param int $shardStart
+     * @param int $shardEnd
+     */
+    public function __construct(int $taskId, int $shardStart, int $shardEnd)
     {
-        $this->team = $team;
+        $this->taskId     = $taskId;
+        $this->shardStart = $shardStart;
+        $this->shardEnd   = $shardEnd;
     }
 
     /**
@@ -24,19 +41,21 @@ class Task extends \Threaded
         try {
             $couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
 
-            $limit = 100;
+            $limit = 1000;
             $skip  = 0;
             $total = 0;
 
+            $time  = microtime(true);
             do {
                 $docs = $this->getChannels($couch, $limit, $skip);
-                $docs = $this->updateChannels($couch, $docs);
+                array_walk($docs, $this->getChanges($couch));
 
                 $total += count($docs);
                 $skip  += $limit;
             } while (count($docs) == $limit);
 
-            echo 'Worker ', $this->team, ' has processed ', $total, ' channels', PHP_EOL;
+            $time = microtime(true) - $time;
+            echo 'Worker ', $this->taskId, ' has processed ', $total, ' channels in ', $time, ' seconds', PHP_EOL;
         } catch (ExceptionInterface $exception) {
             echo $exception->getMessage(), PHP_EOL;
         }
@@ -48,16 +67,17 @@ class Task extends \Threaded
             'selector' => [
                 '$and' => [
                     [
-                        'team_id'  => [
-                            '$gte' => $this->team * 125,
+                        'shard_key'  => [
+                            '$gte' => $this->shardStart,
                         ],
                     ],
                     [
-                        'team_id' => [
-                            '$lt' => ($this->team + 1) * 125,
+                        'shard_key' => [
+                            '$lte' => $this->shardEnd,
                         ],
                     ],
                 ],
+                'is_active' => true,
             ],
             'limit' => $limit,
             'skip'  => $skip,
@@ -65,12 +85,11 @@ class Task extends \Threaded
         return $couch->findDocuments('channels', $query)['docs'];
     }
 
-    private function updateChannels(Client $couch, array $docs): array
+    private function getChanges(Client $couch)
     {
-        array_walk($docs, function (array &$dock) {
-            $dock['shard_id'] = $dock['team_id'] % 256;
-        });
-
-        return $couch->bulkDocuments('channels', $docs);
+        return function (array $channel) use ($couch) {
+            $db = sprintf('channel_notifications_t%d_u%d', $channel['team_id'], $channel['user_id']);
+            return $couch->getDatabaseChanges($db, ['include_docs' => 'true'])['results'];
+        };
     }
 }
