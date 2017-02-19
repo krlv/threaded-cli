@@ -1,0 +1,50 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Threaded\Couch\Client;
+use Threaded\Couch\Exception\ExceptionInterface;
+
+$time = microtime(true);
+
+try {
+    $couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
+
+    $limit = 1000;
+    $skip  = 0;
+    $total = 0;
+
+    do {
+        $docs = get_channels($couch, $limit, $skip);
+        array_walk($docs, get_changes($couch));
+
+        $total += count($docs);
+        $skip  += $limit;
+    } while (count($docs) == $limit);
+
+    echo 'Single-thread worker has processed ', $total, ' channels', PHP_EOL;
+} catch (ExceptionInterface $exception) {
+    echo $exception->getMessage(), PHP_EOL;
+}
+
+$time = microtime(true) - $time;
+echo 'Single-thread worker finished in ', $time, ' seconds', PHP_EOL;
+
+
+function get_channels(Client $couch, int $limit, int $skip): array
+{
+    $query = [
+        'selector' => ['is_active' => true],
+        'limit'    => $limit,
+        'skip'     => $skip,
+    ];
+    return $couch->findDocuments('channels', $query)['docs'];
+}
+
+function get_changes(Client $couch)
+{
+    return function (array $channel) use ($couch) {
+        $db = sprintf('channel_notifications_t%d_u%d', $channel['team_id'], $channel['user_id']);
+        return $couch->getDatabaseChanges($db, ['include_docs' => 'true'])['results'];
+    };
+}

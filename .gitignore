@@ -3,6 +3,7 @@
 !bin/console
 !bin/setup
 !bin/sleep
+!bin/single
 !bin/symfony_requirements
 /vendor/
 
