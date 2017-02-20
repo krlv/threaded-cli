@@ -25,7 +25,7 @@ try {
         ],
         'language' => 'javascript',
     ]);
-    echo 'Design document \'channels\' was created for database \'channels\'', PHP_EOL;
+    echo 'Design document \'channels\' was created for database \'channels\'', P§HP_EOL;
 }
 
 try {
@@ -35,9 +35,9 @@ try {
     echo 'Database \'channel_notifications\' was created', PHP_EOL;
 }
 
-for ($i = 0; $i < 1000; ++$i) {
-    $team = random_int(1, 1000);
-    $user = random_int(1, 1000);
+for ($i = 0; $i < 100000; ++$i) {
+    $team = random_int(1, 100000);
+    $user = random_int(1, 100000);
 
     $channels = [];
     for ($j = 1, $n = random_int(1, 4); $j < $n; ++$j) {
