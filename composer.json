@@ -9,7 +9,8 @@
   ],
   "require": {
     "php": ">=7.0",
-    "guzzlehttp/guzzle": "~6.0"
+    "guzzlehttp/guzzle": "~6.0",
+    "cilex/cilex": "~2.0"
   },
   "autoload": {
     "psr-4": { "Threaded\\": "src/" }
