@@ -1,38 +1,8 @@
 #!/usr/bin/env php
 <?php
+use Threaded\App\AppFactory;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Threaded\Autoloader;
-use Threaded\Couch\Client;
-use Threaded\Task;
-
-$time = microtime(true);
-
-//$couch = new Client('172.17.0.1', 5984, 'root', 'X5ud07rm');
-//print_r($couch->getAllDatabases());
-
-// number of shards in the application
-$shard = 256;
-
-// pool size
-$size = 8;
-$pool = new Pool($size, Autoloader::class, [__DIR__ . '/../vendor/autoload.php']);
-
-// each task will process $chunk amount of shards
-$chunk = round($shard / $size, 0, PHP_ROUND_HALF_UP);
-
-// submit a task to the pool
-for ($i = 0; $i < $size; ++$i) {
-    $start = $chunk * $i;
-    $end   = $chunk * ($i + 1) - 1;
-    $pool->submit(new Task($i, $start, $end));
-}
-
-// in the real world, do some ::collect somewhere
-// shutdown, because explicit is good
-$pool->shutdown();
-
-$time = microtime(true) - $time;
-echo 'Multi-thread worker finished in ', $time, ' seconds', PHP_EOL;
-
-//print_r($couch->getAllDatabases());
+$app = AppFactory::createConsoleApp('Threaded CLI Application', 'v1.0');
+$app->run();
