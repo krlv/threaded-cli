@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Threaded\Autoloader;
 use Threaded\Task;
 
-class Threaded extends Command
+class MultiThreaded extends Command
 {
     /**
      * {@inheritDoc}
@@ -17,8 +17,8 @@ class Threaded extends Command
     protected function configure()
     {
         $this
-            ->setName('threaded')
-            ->setDescription('Start threaded worker')
+            ->setName('multi')
+            ->setDescription('Start multi-threaded worker')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'If set, worker will handle data in debug mode')
         ;
     }

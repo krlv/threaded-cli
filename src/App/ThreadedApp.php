@@ -3,7 +3,7 @@ namespace Threaded\App;
 
 use Cilex\Application;
 use Threaded\App\Command\SingleThread;
-use Threaded\App\Command\Threaded;
+use Threaded\App\Command\MultiThreaded;
 
 class ThreadedApp extends Application
 {
@@ -14,7 +14,7 @@ class ThreadedApp extends Application
 
     public function registerCommands()
     {
-        $this->command(new Threaded());
+        $this->command(new MultiThreaded());
         $this->command(new SingleThread());
 
         return $this;
